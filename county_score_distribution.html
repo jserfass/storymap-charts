@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>County Suitability Score Distribution</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #fff; padding: 20px; }
+  .chart-container { position: relative; width: 100%; height: 420px; }
+</style>
+</head>
+<body>
+<div class="chart-container">
+  <canvas id="histChart"></canvas>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.0.1/chartjs-plugin-annotation.min.js"></script>
+<script>
+const bins = [
+  {low:118.5,high:121.1,count:1},{low:121.1,high:123.6,count:2},{low:123.6,high:126.2,count:2},
+  {low:126.2,high:128.8,count:2},{low:128.8,high:131.4,count:6},{low:131.4,high:134.0,count:12},
+  {low:134.0,high:136.5,count:18},{low:136.5,high:139.1,count:33},{low:139.1,high:141.7,count:23},
+  {low:141.7,high:144.3,count:38},{low:144.3,high:146.9,count:57},{low:146.9,high:149.4,count:68},
+  {low:149.4,high:152.0,count:92},{low:152.0,high:154.6,count:104},{low:154.6,high:157.2,count:107},
+  {low:157.2,high:159.8,count:110},{low:159.8,high:162.3,count:117},{low:162.3,high:164.9,count:92},
+  {low:164.9,high:167.5,count:87},{low:167.5,high:170.1,count:85},{low:170.1,high:172.7,count:64},
+  {low:172.7,high:175.3,count:44},{low:175.3,high:177.8,count:45},{low:177.8,high:180.4,count:33},
+  {low:180.4,high:183.0,count:31},{low:183.0,high:185.6,count:22},{low:185.6,high:188.2,count:21},
+  {low:188.2,high:190.7,count:15},{low:190.7,high:193.3,count:11},{low:193.3,high:195.9,count:4}
+];
+
+const top25Threshold = 188.2;
+const top25Color = 'rgba(29,158,117,0.65)';
+const mainColor = 'rgba(136,135,128,0.45)';
+const colors = bins.map(b => b.low >= top25Threshold ? top25Color : mainColor);
+const annoColor = 'rgba(0,0,0,0.5)';
+
+new Chart(document.getElementById('histChart'), {
+  type: 'bar',
+  data: {
+    labels: bins.map(b => b.low.toFixed(0)),
+    datasets: [{
+      data: bins.map(b => b.count),
+      backgroundColor: colors,
+      borderRadius: 1,
+      barPercentage: 1.0,
+      categoryPercentage: 1.0
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    layout: { padding: { top: 30 } },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          title: (ctx) => {
+            const i = ctx[0].dataIndex;
+            return 'Score range: ' + bins[i].low.toFixed(1) + ' \u2013 ' + bins[i].high.toFixed(1);
+          },
+          label: (ctx) => ctx.raw + ' counties'
+        }
+      },
+      annotation: {
+        annotations: {
+          meanLine: {
+            type: 'line',
+            xMin: 15.5,
+            xMax: 15.5,
+            borderColor: annoColor,
+            borderWidth: 1.5,
+            borderDash: [6, 4],
+            label: {
+              display: true,
+              content: 'Mean (160.25)',
+              position: 'start',
+              font: { size: 11 },
+              color: annoColor,
+              backgroundColor: 'transparent',
+              padding: 2
+            }
+          },
+          top25Line: {
+            type: 'line',
+            xMin: 27,
+            xMax: 27,
+            borderColor: 'rgba(29,158,117,0.7)',
+            borderWidth: 1.5,
+            borderDash: [6, 4],
+            label: {
+              display: true,
+              content: 'Top 25',
+              position: 'start',
+              font: { size: 11 },
+              color: 'rgba(29,158,117,0.8)',
+              backgroundColor: 'transparent',
+              padding: 2
+            }
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        ticks: { 
+          color: '#555', 
+          font: { size: 11 },
+          maxRotation: 45,
+          callback: function(val, i) { return i % 3 === 0 ? bins[i].low.toFixed(0) : ''; }
+        },
+        grid: { display: false },
+        title: { display: true, text: 'Mean suitability score (raw weighted sum)', color: '#555', font: { size: 13 } }
+      },
+      y: {
+        beginAtZero: true,
+        ticks: { color: '#555', font: { size: 12 } },
+        grid: { color: 'rgba(0,0,0,0.06)' },
+        title: { display: true, text: 'Number of counties', color: '#555', font: { size: 13 } }
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>

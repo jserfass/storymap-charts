@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Top 25 Counties by Suitability Score</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #fff; padding: 20px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 18px; font-size: 13px; color: #555; }
+  .legend span { display: flex; align-items: center; gap: 5px; }
+  .legend .dot { width: 12px; height: 12px; border-radius: 2px; }
+  .chart-container { position: relative; width: 100%; height: 780px; }
+</style>
+</head>
+<body>
+<div class="legend">
+  <span><span class="dot" style="background:#534AB7"></span>Colorado</span>
+  <span><span class="dot" style="background:#1D9E75"></span>Idaho</span>
+  <span><span class="dot" style="background:#378ADD"></span>Wyoming</span>
+  <span><span class="dot" style="background:#D85A30"></span>Utah</span>
+  <span><span class="dot" style="background:#639922"></span>Montana</span>
+  <span><span class="dot" style="background:#BA7517"></span>Nevada</span>
+</div>
+<div class="chart-container">
+  <canvas id="rankChart"></canvas>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const data = [
+  {county:'Lake County', state:'CO', score:10.00},
+  {county:'Lemhi County', state:'ID', score:9.73},
+  {county:'Custer County', state:'ID', score:9.71},
+  {county:'Idaho County', state:'ID', score:9.70},
+  {county:'Morgan County', state:'UT', score:9.70},
+  {county:'Park County', state:'WY', score:9.68},
+  {county:'Teton County', state:'WY', score:9.63},
+  {county:'Salt Lake County', state:'UT', score:9.59},
+  {county:'Grand County', state:'CO', score:9.56},
+  {county:'Gilpin County', state:'CO', score:9.55},
+  {county:'Pitkin County', state:'CO', score:9.51},
+  {county:'Utah County', state:'UT', score:9.49},
+  {county:'Wasatch County', state:'UT', score:9.46},
+  {county:'Adams County', state:'ID', score:9.43},
+  {county:'San Juan County', state:'CO', score:9.43},
+  {county:'Camas County', state:'ID', score:9.38},
+  {county:'Hot Springs County', state:'WY', score:9.31},
+  {county:'Sweet Grass County', state:'MT', score:9.26},
+  {county:'Hinsdale County', state:'CO', score:9.24},
+  {county:'Teton County', state:'ID', score:9.22},
+  {county:'Gunnison County', state:'CO', score:9.22},
+  {county:'Big Horn County', state:'WY', score:9.21},
+  {county:'Eagle County', state:'CO', score:9.21},
+  {county:'Clear Creek County', state:'CO', score:9.20},
+  {county:'Esmeralda County', state:'NV', score:9.20}
+];
+
+const stateColors = {
+  'CO':'#534AB7','ID':'#1D9E75','WY':'#378ADD',
+  'UT':'#D85A30','MT':'#639922','NV':'#BA7517'
+};
+
+new Chart(document.getElementById('rankChart'), {
+  type: 'bar',
+  data: {
+    labels: data.map(d => d.county + ', ' + d.state),
+    datasets: [{
+      data: data.map(d => d.score),
+      backgroundColor: data.map(d => stateColors[d.state]),
+      borderRadius: 3,
+      barThickness: 22
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    maintainAspectRatio: false,
+    layout: { padding: { right: 50 } },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => 'Score: ' + ctx.raw.toFixed(2) + ' / 10'
+        }
+      }
+    },
+    scales: {
+      x: {
+        min: 8.5,
+        max: 10.2,
+        ticks: { stepSize: 0.5, color: '#555', font: { size: 12 } },
+        grid: { color: 'rgba(0,0,0,0.06)' },
+        title: { display: true, text: 'Normalized suitability score (1\u201310)', color: '#555', font: { size: 13 } }
+      },
+      y: {
+        ticks: { color: '#333', font: { size: 12 } },
+        grid: { display: false }
+      }
+    }
+  },
+  plugins: [{
+    id: 'scoreLabels',
+    afterDatasetsDraw(chart) {
+      const ctx = chart.ctx;
+      const meta = chart.getDatasetMeta(0);
+      ctx.font = '11px sans-serif';
+      ctx.fillStyle = 'rgba(0,0,0,0.45)';
+      ctx.textBaseline = 'middle';
+      meta.data.forEach((bar, i) => {
+        ctx.fillText(data[i].score.toFixed(2), bar.x + 6, bar.y);
+      });
+    }
+  }]
+});
+</script>
+</body>
+</html>
