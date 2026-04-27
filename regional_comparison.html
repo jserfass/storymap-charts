@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Regional Suitability Comparison</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #fff; padding: 20px; }
+  .chart-container { position: relative; width: 100%; height: 520px; }
+</style>
+</head>
+<body>
+<div class="chart-container">
+  <canvas id="regionChart"></canvas>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const regions = [
+  {name:'Utah / Wasatch Front', mean:183.55, min:175.00, max:193.30, top:'Morgan County', count:29},
+  {name:'Wyoming', mean:179.72, min:165.48, max:193.10, top:'Park County', count:23},
+  {name:'Central Idaho', mean:178.28, min:166.40, max:193.54, top:'Lemhi County', count:44},
+  {name:'Nevada', mean:177.84, min:167.65, max:189.03, top:'Esmeralda County', count:17},
+  {name:'Montana', mean:174.76, min:157.96, max:189.50, top:'Sweet Grass County', count:56},
+  {name:'Colorado', mean:173.89, min:152.34, max:195.90, top:'Lake County', count:64},
+  {name:'Four Corners', mean:167.78, min:155.04, max:182.14, top:'Mora County', count:48},
+  {name:'Alaska', mean:167.63, min:153.01, max:185.33, top:'Yakutat City & Borough', count:30},
+  {name:'Pacific Northwest', mean:166.49, min:150.82, max:184.86, top:'Wallowa County', count:73},
+  {name:'Southeast Appalachians', mean:157.09, min:122.32, max:179.78, top:'Yancey County', count:672},
+  {name:'Northeast', mean:151.70, min:118.48, max:186.39, top:'Grafton County', count:233},
+  {name:'California', mean:145.81, min:126.89, max:171.22, top:'Mono County', count:57}
+];
+
+const barColors = [
+  '#1D9E75','#378ADD','#1D9E75','#BA7517','#639922',
+  '#534AB7','#D85A30','#762A83','#378ADD',
+  '#639922','#D4537E','#D85A30'
+];
+
+new Chart(document.getElementById('regionChart'), {
+  type: 'bar',
+  data: {
+    labels: regions.map(r => r.name),
+    datasets: [
+      {
+        label: 'Mean score',
+        data: regions.map(r => r.mean),
+        backgroundColor: barColors,
+        borderRadius: 3,
+        barThickness: 26
+      },
+      {
+        label: 'Score range',
+        data: regions.map(r => [r.min, r.max]),
+        type: 'bar',
+        backgroundColor: 'rgba(0,0,0,0)',
+        borderColor: 'rgba(0,0,0,0.25)',
+        borderWidth: 1.5,
+        borderSkipped: false,
+        barThickness: 6
+      }
+    ]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    maintainAspectRatio: false,
+    layout: { padding: { right: 20 } },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          title: (ctx) => regions[ctx[0].dataIndex].name,
+          label: (ctx) => {
+            const r = regions[ctx.dataIndex];
+            if (ctx.datasetIndex === 0) {
+              return [
+                'Mean: ' + r.mean.toFixed(1),
+                'Range: ' + r.min.toFixed(1) + ' \u2013 ' + r.max.toFixed(1),
+                'Top: ' + r.top,
+                'Counties: ' + r.count
+              ];
+            }
+            return null;
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        min: 110,
+        max: 200,
+        ticks: { stepSize: 10, color: '#555', font: { size: 12 } },
+        grid: { color: 'rgba(0,0,0,0.06)' },
+        title: { display: true, text: 'Mean suitability score (raw weighted sum)', color: '#555', font: { size: 13 } }
+      },
+      y: {
+        ticks: { color: '#333', font: { size: 12 } },
+        grid: { display: false }
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>
