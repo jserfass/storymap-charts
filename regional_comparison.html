@@ -48,16 +48,6 @@ new Chart(document.getElementById('regionChart'), {
         backgroundColor: barColors,
         borderRadius: 3,
         barThickness: 26
-      },
-      {
-        label: 'Score range',
-        data: regions.map(r => [r.min, r.max]),
-        type: 'bar',
-        backgroundColor: 'rgba(0,0,0,0)',
-        borderColor: 'rgba(0,0,0,0.25)',
-        borderWidth: 1.5,
-        borderSkipped: false,
-        barThickness: 6
       }
     ]
   },
